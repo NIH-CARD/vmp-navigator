@@ -1,0 +1,119 @@
+# VMP Navigator — curated resource dataset.
+# PROTOTYPE STUB: confirm every name/URL against DARS, CMS, and NIH before any real use.
+# tracks: which service tracks surface this resource. transportation_required: drop if user has no car.
+# always_include: surface regardless. national: also valid outside Virginia.
+
+resources:
+  - id: nih_memory_aging_clinic
+    name: "NIH Memory & Aging Clinic (NIA / CARD)"
+    type: memory_clinic
+    source: NIH
+    tracks: ["clinical", "research"]
+    always_include: true        # priority connection per project design
+    national: true
+    url: "https://www.nia.nih.gov/health/clinical-trials-and-studies/find-alzheimers-disease-research-center"
+    blurb: "Priority connection for clinical evaluation and research participation."
+
+  - id: dars_memory_assessment
+    name: "Virginia DARS Memory Assessment Centers"
+    type: memory_clinic
+    source: DARS
+    tracks: ["clinical"]
+    url: "https://www.dars.virginia.gov/"
+    blurb: "State-supported memory assessment centers across Virginia. Search by ZIP."
+
+  - id: cms_care_compare
+    name: "Primary care — Medicare.gov Care Compare"
+    type: primary_care
+    source: CMS
+    tracks: ["clinical"]
+    transportation_required: true
+    national: true
+    url: "https://www.medicare.gov/care-compare/"
+    blurb: "Find primary care providers near your ZIP code."
+
+  - id: dars_aaa
+    name: "Area Agency on Aging (DARS locator)"
+    type: aaa
+    source: DARS
+    tracks: ["clinical", "community"]
+    always_include: true
+    url: "https://www.dars.virginia.gov/"
+    blurb: "Local aging services, including transportation and in-home support."
+
+  - id: direct_connect_va
+    name: "Direct Connect VA — No Wrong Door"
+    type: aaa
+    source: VMP
+    tracks: ["community"]
+    url: "https://www.nowrongdoor.virginia.gov/"
+    blurb: "A single front door to Virginia's community and long-term services."
+
+  - id: alz_navigator
+    name: "Alzheimer's Association — Alzheimer's Navigator"
+    type: caregiver_program
+    source: AlzAssoc
+    tracks: ["community"]
+    national: true
+    url: "https://www.alz.org/help-support/resources/alznavigator"
+    blurb: "Personalized action plans for people living with dementia and caregivers."
+
+  - id: alz_helpline
+    name: "Alzheimer's Association 24/7 Helpline — 800-272-3900"
+    type: support_line
+    source: AlzAssoc
+    tracks: ["community"]
+    always_include: true
+    national: true
+    url: "https://www.alz.org/help-support/resource"
+    blurb: "Free, confidential support any time, day or night."
+
+  - id: clinicaltrials_gov
+    name: "ClinicalTrials.gov"
+    type: clinical_trial
+    source: NIH
+    tracks: ["research"]
+    national: true
+    url: "https://clinicaltrials.gov/"
+    blurb: "Search registered studies, including remote and Virginia-based trials."
+
+  - id: alzheimers_gov_trials
+    name: "Alzheimers.gov — Find Clinical Trials"
+    type: clinical_trial
+    source: NIH
+    tracks: ["research"]
+    national: true
+    url: "https://www.alzheimers.gov/clinical-trials/find-clinical-trials"
+    blurb: "Federal listing of dementia and caregiver studies."
+
+  - id: alz_trialmatch
+    name: "Alzheimer's Association TrialMatch"
+    type: clinical_trial
+    source: AlzAssoc
+    tracks: ["research"]
+    national: true
+    url: "https://www.alz.org/alzheimers-dementia/research-and-progress/clinical-trials/trialmatch"
+    blurb: "Free service that matches you to studies based on your profile."
+
+  - id: brain_health_cdc
+    name: "Brain health & prevention (CDC Healthy Brain Initiative)"
+    type: education
+    source: CMS
+    tracks: ["brain_health", "community"]
+    national: true
+    url: "https://www.cdc.gov/aging/healthybrain/index.htm"
+    blurb: "Plain-language information on protecting brain health."
+
+  # Phase 2 hand-off: a SEPARATE VMP app that collects a short clock-drawing activity.
+  # The navigator only links out — it sends no answers, flags, or identifiers in the URL
+  # (just a non-identifying source tag). The collector app runs its OWN consent/intake and
+  # is responsible for its own IRB approval and PHI handling. Placeholder URL for now.
+  - id: vmp_clock_collector
+    name: "VMP Clock-Drawing Activity (research)"
+    type: data_collection
+    source: VMP
+    tracks: ["research", "brain_health"]
+    external_app: true
+    url: "https://clock-collector-alpha.streamlit.app/?src=vmp_navigator"
+    note: "Opens a separate VMP research app. Voluntary — you can stop at any time."
+    blurb: "Optional: contribute a short, voluntary clock-drawing activity to VMP research. Takes a few minutes and is not a diagnosis."

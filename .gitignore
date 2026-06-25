@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+# Never commit secrets or local data
+.streamlit/secrets.toml
+data/analytics.jsonl
+data/phi_queue.json
+data/ai_usage.jsonl
+# Claude Code: commit settings.json + commands, ignore personal local overrides
+.claude/settings.local.json

@@ -1,0 +1,5 @@
+# Optional — only needed if you enable the "Learn more" assistant.
+#   pip install -r requirements-ai.txt
+#   export ANTHROPIC_API_KEY=sk-...   and   export VMP_ENABLE_AI=1
+# The base app runs fully without this.
+anthropic>=0.40

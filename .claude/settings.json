@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(python tests/test_engine.py)",
+      "Bash(python tests/test_learn_more_guardrails.py)",
+      "Bash(python tests/test_trials.py)",
+      "Bash(python trials.py)",
+      "Bash(python -m pytest:*)",
+      "Bash(python seed_data.py:*)",
+      "Bash(python verify_ai.py)",
+      "Bash(python -m py_compile:*)",
+      "Bash(streamlit run:*)",
+      "Bash(pip install -r requirements.txt)",
+      "Bash(pip install -r requirements-ai.txt)"
+    ],
+    "deny": [
+      "Read(.streamlit/secrets.toml)",
+      "Read(data/phi_queue.json)"
+    ]
+  }
+}

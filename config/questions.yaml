@@ -1,0 +1,206 @@
+# VMP Navigator — question graph (clinical content lives HERE, not in code).
+# Node types: info | gate | single_select | multi_select | collect | contact | result
+# goto: a node id, or "__next__" to advance the queue/continuation, or "__done__".
+# Field names mirror the working document; RECONCILE against the live REDCap data dictionary.
+
+nodes:
+  - id: landing
+    type: info
+    title: "Welcome to the VMP Care Navigator"
+    body: >
+      I can connect you with memory care, caregiver support, brain-health
+      information, and research opportunities in Virginia. I'll ask a few short
+      questions, one at a time. You can stay completely anonymous — no
+      information is required to receive resources.
+    note: "This tool helps you find resources. It is not medical advice and cannot diagnose any condition. If this is an emergency, call 911."
+    goto: va_check
+
+  - id: va_check
+    type: gate
+    field: vadr_state
+    prompt: "First, do you live in Virginia?"
+    options:
+      - { value: "yes", label: "Yes, I live in Virginia", goto: entry }
+      - { value: "no",  label: "No, I live somewhere else", goto: national_only }
+
+  - id: national_only
+    type: info
+    title: "National resources"
+    body: >
+      VMP's services are for Virginia residents, but here are national
+      resources that can help anywhere. You'll see the full list at the end.
+    goto: contact
+
+  # ---------------- Tree 1: Entry ----------------
+  - id: entry
+    type: multi_select
+    field: vadr_wellbeing
+    prompt: "What brings you here today?"
+    help: "The more you tell us, the better we can help. Choose all that apply."
+    after_queue: service_menu
+    options:
+      - { value: "plwd",         label: "I notice changes in my own thinking or memory", goto: plwd_q1 }
+      - { value: "caregiver",    label: "I help care for someone with memory concerns",  goto: cg_q1 }
+      - { value: "brain_health", label: "I want general brain-health or prevention info", goto: brain_health_info }
+
+  # ---------------- Tree 2: PLWD path ----------------
+  - id: plwd_q1
+    type: gate
+    field: vadr_cg1
+    prompt: "In the past 12 months, have you had worsening confusion or memory loss?"
+    help: "Not occasional forgetfulness — changes that happen more often or get worse over time."
+    options:
+      - { value: "yes", label: "Yes", goto: plwd_q2 }
+      - { value: "no",  label: "No",  goto: brain_health_info }
+
+  - id: plwd_q2
+    type: single_select
+    field: vadar_cg_2
+    prompt: "How often has memory loss caused you to give up daily activities (cooking, driving, paying bills, taking medications)?"
+    options:
+      - { value: "always",    label: "Always",    goto: plwd_q3 }
+      - { value: "usually",   label: "Usually",   goto: plwd_q3 }
+      - { value: "sometimes", label: "Sometimes", goto: plwd_q3 }
+      - { value: "rarely",    label: "Rarely",    goto: "__next__" }
+      - { value: "never",     label: "Never",     goto: "__next__" }
+
+  - id: plwd_q3
+    type: single_select
+    field: vadar_3_cog
+    prompt: "How often do you need help with day-to-day activities because of memory changes?"
+    options:
+      - { value: "always",    label: "Always",    goto: plwd_q4 }
+      - { value: "usually",   label: "Usually",   goto: plwd_q4 }
+      - { value: "sometimes", label: "Sometimes", goto: plwd_q4 }
+      - { value: "rarely",    label: "Rarely",    goto: "__next__" }
+      - { value: "never",     label: "Never",     goto: "__next__" }
+
+  - id: plwd_q4
+    type: single_select
+    field: vadr_cg4
+    prompt: "When you need help with daily activities, how often are you able to get the help you need?"
+    help: "There are no wrong answers — this just helps us connect you with the right support."
+    options:
+      - { value: "always",    label: "Always",    goto: plwd_q6 }
+      - { value: "usually",   label: "Usually",   goto: plwd_q6 }
+      - { value: "sometimes", label: "Sometimes", goto: plwd_q6 }
+      - { value: "rarely",    label: "Rarely",    goto: plwd_q6 }
+      - { value: "never",     label: "Never",     goto: plwd_q6 }
+
+  - id: plwd_q6
+    type: single_select
+    field: vadr_cg6
+    prompt: "Have you talked with a healthcare provider about your memory or confusion?"
+    options:
+      - { value: "yes",      label: "Yes",         goto: "__next__" }
+      - { value: "no",       label: "No",          goto: "__next__" }
+      - { value: "dontknow", label: "I'm not sure", goto: "__next__" }
+      - { value: "decline",  label: "Prefer not to say", goto: "__next__" }
+
+  - id: brain_health_info
+    type: info
+    title: "Brain-health information"
+    body: >
+      We'll include brain-health and prevention resources for you at the end.
+      Would you also like to be connected with local programs? You can choose
+      that on the next screen.
+    goto: "__next__"
+
+  # ---------------- Tree 3: Caregiver path (light) ----------------
+  - id: cg_q1
+    type: gate
+    field: vadr_2009_s13_1
+    prompt: "In the past month, did you provide memory care or help to a friend or family member?"
+    options:
+      - { value: "yes", label: "Yes", goto: cg_q2 }
+      - { value: "no",  label: "No",  goto: "__next__" }
+
+  - id: cg_q2
+    type: single_select
+    field: vadr_2009_m18_8
+    prompt: "What has been the hardest part of being a caregiver?"
+    help: "Being a caregiver can be incredibly challenging. This helps us find the right support for you."
+    options:
+      - { value: "01", label: "Financial burden",            goto: "__next__" }
+      - { value: "02", label: "No time for myself",           goto: "__next__" }
+      - { value: "03", label: "No time for family",           goto: "__next__" }
+      - { value: "05", label: "It creates a lot of stress",   goto: "__next__" }
+      - { value: "06", label: "It's hurting my own health",   goto: "__next__" }
+      - { value: "88", label: "Nothing has been difficult",   goto: "__next__" }
+
+  # ---------------- Tree 4: Service routing menu ----------------
+  - id: service_menu
+    type: multi_select
+    field: service_tracks
+    prompt: "What would you like help with today?"
+    help: "Choose all that apply — we'll go through each one."
+    after_queue: loopback
+    options:
+      - { value: "clinical",  label: "Finding clinical care (memory clinic, doctor, screening)", goto: clinical_zip }
+      - { value: "community", label: "Community & caregiver resources",                          goto: community_intro }
+      - { value: "research",  label: "Research studies & clinical trials",                        goto: research_intro }
+
+  # Clinical track
+  - id: clinical_zip
+    type: collect
+    field: vadr_2009_s12_16a
+    input: zip
+    prompt: "What's your ZIP code? We'll find options near you."
+    goto: clinical_complaint
+
+  - id: clinical_complaint
+    type: single_select
+    field: clinical_complaint
+    prompt: "What kind of care are you looking for?"
+    options:
+      - { value: "memory_clinic", label: "Memory or thinking concerns (memory clinic)", goto: clinical_transport }
+      - { value: "primary_care",  label: "General health / a primary care doctor",      goto: clinical_transport }
+      - { value: "not_sure",      label: "I'm not sure",                                 goto: clinical_transport }
+
+  - id: clinical_transport
+    type: gate
+    field: clinical_transport_access
+    prompt: "Can you drive, or do you have access to a car?"
+    help: "If not, we'll include telehealth and transportation options."
+    options:
+      - { value: "yes", label: "Yes", goto: "__next__" }
+      - { value: "no",  label: "No",  goto: "__next__" }
+
+  # Community track (light)
+  - id: community_intro
+    type: info
+    title: "Community & caregiver resources"
+    body: >
+      We'll include local Area Agency on Aging contacts, the Alzheimer's
+      Navigator, and Virginia's No Wrong Door in your results.
+    goto: "__next__"
+
+  # Research track (light)
+  - id: research_intro
+    type: gate
+    field: research_interest
+    prompt: "Would you like to explore ADRD research studies or clinical trials?"
+    options:
+      - { value: "yes", label: "Yes, show me research options", goto: "__next__" }
+      - { value: "no",  label: "Not right now",                 goto: "__next__" }
+
+  # ---------------- Loop-back + contact ----------------
+  - id: loopback
+    type: single_select
+    field: loopback_choice
+    prompt: "Is there anything else I can help you with today?"
+    options:
+      - { value: "more", label: "Yes — help me with something else", goto: service_menu }
+      - { value: "done", label: "No, I'm all set",                   goto: contact }
+
+  - id: callback
+    type: contact
+    prompt: "Would it be OK if someone from our team reached out to you directly?"
+    help: "This is optional. You can skip and still see all your resources."
+    goto: "__resume__"
+
+  - id: contact
+    type: contact
+    prompt: "Would you like someone to follow up with you? (Optional)"
+    help: "You can skip this and still get every resource. No information is required."
+    goto: "__done__"

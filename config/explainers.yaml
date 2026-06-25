@@ -1,0 +1,172 @@
+# VMP Navigator — "More about this" explainers.
+# Plain-language, ~6th-grade reading level, GENERAL information only.
+# Hard rules for this content: never diagnose, never interpret the user's own answers,
+# never give individualized medical/legal/financial advice. Point to a clinician for
+# anything personal. This file is meant to be reviewed by the clinical advisory board.
+#
+# `questions:` is a curated, vetted set of common questions shown as BUTTONS. There is no
+# free-text entry: the model can only ever be asked one of these approved questions,
+# grounded in the `body` text above it. Keep questions general and non-diagnostic.
+
+nodes:
+  entry:
+    title: "Is this normal aging, or something more?"
+    body: >
+      Almost everyone forgets things sometimes — a name, where the keys are. What's
+      usually worth mentioning to a doctor is when memory or thinking changes are
+      getting worse over time, happening more often, or making everyday tasks harder.
+      This tool can't tell you what's causing a change — only a clinician can — but it
+      can help you find the right place to ask.
+    questions:
+      - "What's the difference between normal aging and a memory problem?"
+      - "When should someone see a doctor about memory?"
+
+  plwd_q1:
+    title: "What kinds of changes matter?"
+    body: >
+      Examples people often ask about: repeating the same questions, getting lost in
+      familiar places, trouble following a recipe or paying bills, or struggling to
+      find common words. Occasional slips happen to everyone. It's the pattern — more
+      often, or worse than before — that's worth raising with a doctor.
+    questions:
+      - "What memory changes are worth telling a doctor about?"
+      - "Is forgetting names a sign of something serious?"
+
+  plwd_q6:
+    title: "What happens at a memory visit? Who do I see?"
+    body: >
+      You can start with your regular doctor (primary care), who can refer you if
+      needed. A memory clinic has specialists — like neurologists, geriatricians, or
+      neuropsychologists. A first visit often includes questions about your health and
+      daily life, some thinking and memory tasks, and sometimes blood tests or a scan.
+      It helps to bring a list of your medicines and, if you can, someone who knows you
+      well. Asking is a normal, healthy step — many things that affect memory are
+      treatable.
+    questions:
+      - "What happens at a memory evaluation?"
+      - "Which type of doctor should I see?"
+      - "What should I bring to the appointment?"
+
+  cg_q2:
+    title: "It's okay to ask for help"
+    body: >
+      Caregiving is hard, and needing support doesn't mean you're failing — it's one of
+      the most common reasons people reach out. Help can include respite (short-term
+      care so you can rest), support groups, in-home aid, and counseling. The Area
+      Agency on Aging and the Alzheimer's Association 24/7 Helpline (800-272-3900) can
+      talk through options with you, often at no cost.
+    questions:
+      - "What kinds of help are available for caregivers?"
+      - "What is respite care?"
+
+  clinical_complaint:
+    title: "Memory clinic or primary care — what's the difference?"
+    body: >
+      Primary care is your regular doctor — a good first stop who can check for common,
+      treatable causes and refer you onward. A memory clinic is a team of specialists
+      for a deeper evaluation. If you're not sure, that's fine — starting with either
+      one is a reasonable first step.
+    questions:
+      - "What's the difference between a memory clinic and my regular doctor?"
+      - "Where should I start if I'm not sure?"
+
+  callback:
+    title: "What happens if I share my contact?"
+    body: >
+      If you share your information, a trained VMP navigator — not a salesperson — may
+      reach out to help connect you with services. You choose how much to share, and
+      you can stop any time. Sharing is optional: you'll see all your resources either
+      way. In a real deployment, your information is kept in a secure, HIPAA-protected
+      system.
+    questions:
+      - "Who will contact me if I share my information?"
+      - "Do I have to share my information?"
+
+  contact:
+    title: "Do I have to share anything?"
+    body: >
+      No. Sharing is optional. If you do, a VMP navigator can follow up to help you
+      connect with services. You'll get the same resources whether you share or skip.
+    questions:
+      - "What happens if I skip this?"
+      - "Is sharing my information required?"
+
+resource_types:
+  memory_clinic:
+    title: "What is a memory clinic / assessment center?"
+    body: >
+      A place with specialists who evaluate memory and thinking. A visit usually
+      involves questions, some thinking tasks, and sometimes tests. Bring your medicine
+      list and, if possible, someone who knows you. Many evaluations are covered by
+      insurance or Medicare — you can ask about cost when you call.
+    questions:
+      - "What happens at a memory clinic visit?"
+      - "What should I bring?"
+      - "Will insurance or Medicare cover an evaluation?"
+
+  primary_care:
+    title: "Starting with a primary care doctor"
+    body: >
+      Your regular doctor is a good first stop. They can check for common, treatable
+      causes of memory changes and refer you to a specialist if needed.
+    questions:
+      - "Why start with a primary care doctor?"
+      - "Can my regular doctor check my memory?"
+
+  aaa:
+    title: "What is the Area Agency on Aging?"
+    body: >
+      A local public agency that helps older adults and caregivers find services — like
+      meals, transportation, in-home help, and respite care. It's usually free to call
+      and talk through your options.
+    questions:
+      - "What is the Area Agency on Aging?"
+      - "What services does it offer?"
+      - "Is it free to call?"
+
+  clinical_trial:
+    title: "What is a clinical trial? Am I a 'guinea pig'?"
+    body: >
+      A clinical trial is a research study. Taking part is voluntary, you give informed
+      consent before anything begins, and you can leave at any time, for any reason.
+      Some studies test new approaches; others just collect information, like memory
+      tests or scans. Your safety is overseen by independent review boards. Trials are
+      how better treatments get discovered — and some people value the extra monitoring
+      that comes with them.
+    questions:
+      - "What is a clinical trial?"
+      - "Is it safe to join a study?"
+      - "Can I leave a study after I join?"
+
+  support_line:
+    title: "About the 24/7 Helpline"
+    body: >
+      The Alzheimer's Association Helpline (800-272-3900) is free and confidential,
+      staffed any time of day. You can call with questions, in a difficult moment, or
+      just to talk through next steps.
+    questions:
+      - "What can the Helpline help with?"
+      - "Is the Helpline free and confidential?"
+
+  education:
+    title: "About brain-health information"
+    body: >
+      General, plain-language information on habits linked to brain health — like
+      staying active, sleep, blood pressure, hearing, and staying socially connected.
+      It's educational, not a diagnosis or a treatment plan.
+    questions:
+      - "What can I do to support brain health?"
+      - "Can healthy habits lower my risk?"
+
+  data_collection:
+    title: "About the clock-drawing activity"
+    body: >
+      This is a short, optional activity where you draw a clock on your device. Researchers
+      study clock drawings to learn about memory and thinking over time. It takes only a few
+      minutes, it is completely voluntary, and you can stop at any time. It is not a test you
+      can pass or fail, and it is not a diagnosis — a clinician can talk with you about what
+      any results mean. You'll open a separate VMP research app to take part.
+    questions:
+      - "What is the clock-drawing activity?"
+      - "Is it required, and can I stop?"
+      - "Does this activity diagnose dementia?"

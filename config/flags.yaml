@@ -1,0 +1,57 @@
+# VMP Navigator — escalation rules (Tree 5). Evaluated after every answer.
+# HIGH + interrupt: stop routing, offer a human callback, capture contact, keep session open.
+# MEDIUM / WATCH: recorded for the coordinator dashboard; do not interrupt the flow.
+# Condition operators: in (value in list) | equals (exact match). Combine with all/any.
+
+flags:
+  - id: unmet_care_need
+    tier: HIGH
+    interrupt: true
+    sla_hours: 8                # same business day
+    queue: clinical_callback
+    label: "Needs help but rarely/never receives it"
+    message: "It sounds like getting the help you need has been difficult. Would it be OK if someone from our team reached out to you directly?"
+    when:
+      all:
+        - { field: vadar_3_cog, in: ["always", "usually"] }
+        - { field: vadr_cg4,    in: ["rarely", "never"] }
+
+  - id: active_concern_no_provider
+    tier: HIGH
+    interrupt: true
+    sla_hours: 48
+    queue: clinical_outreach
+    label: "Active memory concern, no provider consulted"
+    message: "Since you haven't spoken with a provider yet, we can help you find one and have someone from our team reach out. Is that OK?"
+    when:
+      all:
+        - { field: vadr_cg1, equals: "yes" }
+        - { field: vadr_cg6, in: ["no", "dontknow"] }
+
+  - id: user_requested_human
+    tier: HIGH
+    interrupt: true
+    sla_hours: 24
+    queue: human_callback
+    label: "User asked to speak with a person"
+    message: "Of course. Let's get someone from our team in touch with you."
+    when:
+      any:
+        - { field: requested_human, equals: "yes" }
+
+  - id: caregiver_health_impact
+    tier: MEDIUM
+    interrupt: false
+    queue: caregiver_support
+    label: "Caregiving is harming the caregiver's own health"
+    when:
+      any:
+        - { field: vadr_2009_m18_8, equals: "06" }
+
+  - id: out_of_virginia
+    tier: WATCH
+    interrupt: false
+    label: "Resides outside Virginia — national resources only"
+    when:
+      any:
+        - { field: vadr_state, equals: "no" }
