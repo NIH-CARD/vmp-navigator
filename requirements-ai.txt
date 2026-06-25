@@ -1,5 +1,7 @@
-# Optional — only needed if you enable the "Learn more" assistant.
+# The "Learn more" assistant dependency. This is now ALSO listed in requirements.txt so
+# that Streamlit Community Cloud (which installs only requirements.txt) gets it; this file
+# remains for documentation and minimal local installs. The base app runs fine without a
+# key — the import is lazy and the feature degrades to curated text.
 #   pip install -r requirements-ai.txt
-#   export ANTHROPIC_API_KEY=sk-...   and   export VMP_ENABLE_AI=1
-# The base app runs fully without this.
+#   export ANTHROPIC_API_KEY=sk-...        # presence of a key is the opt-in
 anthropic>=0.40

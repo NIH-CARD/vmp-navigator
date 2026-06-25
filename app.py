@@ -478,8 +478,9 @@ def coordinator_view() -> None:
                     context={"audience": "caregiver", "tracks": ["clinical"], "region_zip3": "232"})
             st.write(out)
             last = (learn_more.read_usage() or [{}])[-1]
+            err = f" · error `{last['error_type']}`" if last.get("error_type") else ""
             st.caption(f"outcome: `{last.get('outcome','?')}` · "
-                       f"{last.get('latency_ms','?')} ms · model `{last.get('model','?')}`")
+                       f"{last.get('latency_ms','?')} ms · model `{last.get('model','?')}`{err}")
 
         usage = learn_more.read_usage()
         if usage:

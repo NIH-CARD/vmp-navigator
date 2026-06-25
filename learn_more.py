@@ -174,7 +174,8 @@ def is_enabled() -> bool:
 USAGE_LOG = Path(__file__).parent / "data" / "ai_usage.jsonl"
 
 
-def _log_usage(topic_key: str, outcome: str, latency_ms: int, output_chars: int) -> None:
+def _log_usage(topic_key: str, outcome: str, latency_ms: int, output_chars: int,
+               error_type: str | None = None) -> None:
     rec = {
         "ts": datetime.now(timezone.utc).isoformat(),
         "topic_key": topic_key,           # which explainer/resource — not PHI
@@ -183,6 +184,10 @@ def _log_usage(topic_key: str, outcome: str, latency_ms: int, output_chars: int)
         "latency_ms": latency_ms,
         "output_chars": output_chars,     # length only, never the text
     }
+    if error_type:
+        # Exception CLASS name only (e.g. "ModuleNotFoundError", "NotFoundError") so silent
+        # fallbacks are diagnosable. Never the exception message — it could echo input.
+        rec["error_type"] = error_type
     try:
         USAGE_LOG.parent.mkdir(exist_ok=True)
         with open(USAGE_LOG, "a", encoding="utf-8") as f:
@@ -254,8 +259,9 @@ def answer(topic_key: str, question: str, grounding_text: str, *, fallback_text:
             messages=[{"role": "user", "content": user_content}],
         )
         text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()
-    except Exception:
-        _log_usage(topic_key, "fallback_error", int((time.monotonic() - t0) * 1000), 0)
+    except Exception as e:
+        _log_usage(topic_key, "fallback_error", int((time.monotonic() - t0) * 1000), 0,
+                   error_type=type(e).__name__)
         return fallback_text  # network/SDK/auth failure -> curated baseline
 
     latency_ms = int((time.monotonic() - t0) * 1000)
@@ -320,8 +326,9 @@ def summarize_trials(trials_list: list[dict], *, fallback_text: str, context: di
             system=TRIALS_SYSTEM, messages=[{"role": "user", "content": user_content}],
         )
         text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()
-    except Exception:
-        _log_usage("trials_summary", "fallback_error", int((time.monotonic() - t0) * 1000), 0)
+    except Exception as e:
+        _log_usage("trials_summary", "fallback_error", int((time.monotonic() - t0) * 1000), 0,
+                   error_type=type(e).__name__)
         return fallback_text
     latency_ms = int((time.monotonic() - t0) * 1000)
     if not text or _OUTPUT_BLOCK.search(text):

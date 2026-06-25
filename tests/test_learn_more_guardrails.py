@@ -98,6 +98,20 @@ def test_usage_telemetry_has_no_transcript():
     assert not ({"question", "answer", "text", "name", "phone", "email"} & set(rec))
 
 
+def test_error_telemetry_records_class_name_only_no_message():
+    # Silent fallbacks must be diagnosable: the error path records the exception CLASS
+    # name (so ops can see e.g. ModuleNotFoundError / auth errors), but never the message
+    # or any transcript, and only the error path carries the extra field.
+    learn_more._log_usage("diag", "fallback_error", 5, 0, error_type="ModuleNotFoundError")
+    rec = learn_more.read_usage()[-1]
+    assert rec["outcome"] == "fallback_error"
+    assert rec["error_type"] == "ModuleNotFoundError"
+    assert not ({"question", "answer", "text", "name", "phone", "email"} & set(rec))
+    # Non-error records stay on the minimal schema (no error_type key).
+    learn_more.answer("diag", "what is an AAA?", GROUNDING, fallback_text=FALLBACK)
+    assert "error_type" not in learn_more.read_usage()[-1]
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     passed = 0
