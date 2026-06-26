@@ -349,3 +349,39 @@ def summarize_trials(trials_list: list[dict], *, fallback_text: str, context: di
         return fallback_text
     _log_usage("trials_summary", "answered", latency_ms, len(text))
     return text + FOOTER
+
+
+# --- Staff-only request-shape probe (temporary diagnostic) -------------------
+# The de-identified usage log records only the error CLASS, never the API's message, so a
+# 400 can't be diagnosed from telemetry alone. This probe makes a few live calls with a
+# FIXED, non-PHI staff question and returns each variant's raw result so staff can see WHICH
+# request shape this key + model accepts. It takes no user input and persists nothing, so the
+# "no free text" and "no session in prompt" guarantees are intact. Remove once the shape is known.
+def diagnose() -> list[dict]:
+    if not is_enabled():
+        return [{"variant": "disabled", "ok": False, "detail": "no ANTHROPIC_API_KEY"}]
+    try:
+        import anthropic
+    except Exception as e:
+        return [{"variant": "import anthropic", "ok": False, "detail": type(e).__name__}]
+    client = anthropic.Anthropic()
+    base = dict(model=model_name(), max_tokens=MAX_TOKENS, system=SYSTEM_PROMPT,
+                messages=[{"role": "user", "content": "What is an Area Agency on Aging?"}])
+    variants = [
+        ("thinking+effort", {**base, "thinking": {"type": "adaptive"},
+                             "output_config": {"effort": effort()}}),
+        ("effort only", {**base, "output_config": {"effort": effort()}}),
+        ("thinking only", {**base, "thinking": {"type": "adaptive"}}),
+        ("plain (model only)", dict(base)),
+    ]
+    results = []
+    for name, kwargs in variants:
+        try:
+            msg = client.messages.create(**kwargs)
+            txt = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
+            results.append({"variant": name, "ok": True, "detail": f"ok · {len(txt)} chars"})
+        except Exception as e:
+            detail = getattr(e, "message", None) or str(e)
+            results.append({"variant": name, "ok": False,
+                            "detail": f"{type(e).__name__}: {detail}"})
+    return results

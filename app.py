@@ -482,6 +482,12 @@ def coordinator_view() -> None:
             st.caption(f"outcome: `{last.get('outcome','?')}` · "
                        f"{last.get('latency_ms','?')} ms · model `{last.get('model','?')}`{err}")
 
+        if st.button("Probe request shapes (staff)"):
+            with st.spinner("Probing the API…"):
+                for r in learn_more.diagnose():
+                    icon = "✅" if r["ok"] else "❌"
+                    st.write(f"{icon} `{r['variant']}` — {r['detail']}")
+
         usage = learn_more.read_usage()
         if usage:
             from collections import Counter
