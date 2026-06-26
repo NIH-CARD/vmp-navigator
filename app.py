@@ -150,9 +150,12 @@ def ai_context(s: dict | None) -> dict:
     return ctx
 
 
-def explainer(key: str, scope: str = "nodes") -> None:
+def explainer(key: str, scope: str = "nodes", uid: str = "") -> None:
     """Show a curated 'More about this' expander if content exists for this key.
-    General education only — no LLM, no PHI, no interpretation of the user's answers."""
+    General education only — no LLM, no PHI, no interpretation of the user's answers.
+    `uid` disambiguates widget keys when the same key renders more than once on a page
+    (e.g. two matched resources sharing a type); without it Streamlit raises a
+    DuplicateElementKey on the question buttons."""
     item = (CFG.get("explainers", {}).get(scope, {}) or {}).get(key)
     if item:
         with st.expander("ℹ️ More about this"):
@@ -161,10 +164,11 @@ def explainer(key: str, scope: str = "nodes") -> None:
             # No free-text entry: only curated, vetted questions as buttons. The model
             # can only ever be asked one of these approved questions. (Off without a key.)
             if learn_more.is_enabled() and item.get("questions"):
-                akey = f"lm_a_{scope}_{key}"
+                slug = f"{scope}_{key}_{uid}" if uid else f"{scope}_{key}"
+                akey = f"lm_a_{slug}"
                 st.caption("Common questions:")
                 for idx, ques in enumerate(item["questions"]):
-                    if st.button(ques, key=f"q_{scope}_{key}_{idx}"):
+                    if st.button(ques, key=f"q_{slug}_{idx}"):
                         with st.spinner("Asking…"):
                             ans = learn_more.answer(
                                 key, ques, item["body"],
@@ -354,7 +358,7 @@ def render_results(s: dict) -> None:
     matched = engine.match_resources(s, CFG)
     if not matched:
         st.write("Connect with the Alzheimer's Association 24/7 Helpline at 800-272-3900 for help getting started.")
-    for r in matched:
+    for ridx, r in enumerate(matched):
         priority = r.get("always_include") and r["source"] == "NIH"
         pill = '<span class="vmp-pill">Priority connection</span>' if priority else ""
         cls = "vmp-resource vmp-priority" if priority else "vmp-resource"
@@ -366,7 +370,7 @@ def render_results(s: dict) -> None:
         )
         if r.get("note"):
             st.caption("↗ " + r["note"])
-        explainer(r["type"], scope="resource_types")
+        explainer(r["type"], scope="resource_types", uid=str(ridx))
 
     render_current_trials(s)
 
