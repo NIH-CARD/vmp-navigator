@@ -31,16 +31,27 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Default model. Opus 4.8 is the most capable; for this grounded, 2-4 sentence education
-# use case, claude-haiku-4-5-20251001 or claude-sonnet-4-6 are much cheaper/faster with
-# comparable quality. Override per deployment with VMP_AI_MODEL (env or Streamlit secrets).
+# Default model. Opus 4.8 at MEDIUM effort: adaptive thinking is on, but capped at `medium`
+# so the model reasons briefly before a short grounded answer instead of overthinking a 2-4
+# sentence reply. Two things this forces in the request below (see answer() / summarize_trials):
+#   - NO `temperature`/`top_p`/`top_k`: Opus 4.7/4.8 reject sampling params with a 400.
+#   - MAX_TOKENS must cover thinking AND the answer (thinking counts against it), so it is far
+#     larger than the ~120 tokens the visible reply needs.
+# Override per deployment with VMP_AI_MODEL / VMP_AI_EFFORT (env or Streamlit secrets). An
+# override must be an effort-capable, sampling-param-free model (Opus 4.6/4.7/4.8, Sonnet 4.6);
+# Haiku 4.5 and Sonnet 4.5 reject the effort param. Any failure falls back to curated text, so
+# a bad override degrades gracefully rather than breaking the page.
 DEFAULT_MODEL = "claude-opus-4-8"
-MAX_TOKENS = 400
-TEMPERATURE = 0.2
+DEFAULT_EFFORT = "medium"      # low | medium | high | max
+MAX_TOKENS = 2048              # headroom for adaptive thinking + the short answer
 
 
 def model_name() -> str:
     return os.environ.get("VMP_AI_MODEL") or DEFAULT_MODEL
+
+
+def effort() -> str:
+    return os.environ.get("VMP_AI_EFFORT") or DEFAULT_EFFORT
 
 FOOTER = ("\n\n_General information, not medical advice. For your specific situation, "
           "a clinician or the VMP team can help._")
@@ -254,7 +265,8 @@ def answer(topic_key: str, question: str, grounding_text: str, *, fallback_text:
         msg = client.messages.create(
             model=model_name(),
             max_tokens=MAX_TOKENS,
-            temperature=TEMPERATURE,
+            thinking={"type": "adaptive"},
+            output_config={"effort": effort()},
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_content}],
         )
@@ -322,7 +334,8 @@ def summarize_trials(trials_list: list[dict], *, fallback_text: str, context: di
         import anthropic
         client = anthropic.Anthropic()
         msg = client.messages.create(
-            model=model_name(), max_tokens=MAX_TOKENS, temperature=TEMPERATURE,
+            model=model_name(), max_tokens=MAX_TOKENS,
+            thinking={"type": "adaptive"}, output_config={"effort": effort()},
             system=TRIALS_SYSTEM, messages=[{"role": "user", "content": user_content}],
         )
         text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()

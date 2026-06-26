@@ -56,7 +56,11 @@ are often cognitively impaired or stressed older caregivers. **Synthetic data on
 ## Conventions
 - Every clinical-logic or routing change ships with a persona test in `tests/test_engine.py`.
 - Every AI-safety change ships with a test in `tests/test_learn_more_guardrails.py`.
-- AI model is `learn_more.model_name()` (default `claude-opus-4-8`, override `VMP_AI_MODEL`).
+- AI model is `learn_more.model_name()` (default `claude-opus-4-8` at `medium` effort; override
+  `VMP_AI_MODEL` / `VMP_AI_EFFORT`). The request uses adaptive thinking + `output_config.effort`
+  and sends NO `temperature` — Opus 4.7/4.8 reject sampling params with a 400; `max_tokens` is
+  sized to cover thinking plus the short answer. Overrides must be effort-capable, sampling-free
+  models (Opus 4.6/4.7/4.8, Sonnet 4.6); Haiku 4.5 and Sonnet 4.5 reject the effort param.
 - Field names mirror the working doc — **reconcile against the live REDCap data dictionary**
   before relying on them (note `vadar_*` vs `vadr_*` inconsistencies).
 - Accessibility: one question per screen, plain ~6th-grade language, large/high-contrast UI,
